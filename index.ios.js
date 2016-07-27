@@ -11,13 +11,19 @@ import {
   Text,
   View
 } from 'react-native';
+
 window.navigator.userAgent = 'react-native';
+
 const io = require('socket.io-client/socket.io');
+const ioConfig = {
+  jsonp: false,
+  transports: ['websocket'],
+};
 
 class Crumbs extends Component {
   constructor(props) {
     super(props);
-    this.socket = io('localhost:3000', {jsonp: false});
+    this.socket = io('http://localhost:3000', ioConfig);
   }
 
   render() {
