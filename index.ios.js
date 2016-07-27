@@ -11,24 +11,25 @@ import {
   Text,
   View
 } from 'react-native';
+window.navigator.userAgent = 'react-native';
+const io = require('socket.io-client/socket.io');
 
 class Crumbs extends Component {
+  constructor(props) {
+    super(props);
+    this.socket = io('localhost:3000', {jsonp: false});
+  }
+
   render() {
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit index.ios.js
-        </Text>
-        <Text style={styles.instructions}>
-          Press Cmd+R to reload,{'\n'}
-          Cmd+D or shake for dev menu
+          Welcome to Crumbs!
         </Text>
       </View>
     );
   }
+
 }
 
 const styles = StyleSheet.create({
