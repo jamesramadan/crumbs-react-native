@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "lint": "./node_modules/eslint/bin/eslint.js .; exit 0",
     "start": "node node_modules/react-native/local-cli/cli.js start"
   },
   "dependencies": {
@@ -11,5 +12,12 @@
     "react-native-form": "^2.0.6",
     "react-native-material-kit": "^0.3.2",
     "socket.io": "^1.4.8"
+  },
+  "devDependencies": {
+    "eslint": "^2.13.1",
+    "eslint-config-airbnb": "^9.0.1",
+    "eslint-plugin-import": "^1.12.0",
+    "eslint-plugin-jsx-a11y": "^1.5.5",
+    "eslint-plugin-react": "^5.2.2"
   }
 }
