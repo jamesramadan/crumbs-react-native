@@ -15,9 +15,11 @@ const ioConfig = {
 };
 
 import Login from './login/login';
+import Map from './map/map';
 
 const ROUTES = {
-  login: Login
+  login: Login,
+  map: Map,
 }
 
 export default class Crumbs extends Component {
@@ -28,14 +30,14 @@ export default class Crumbs extends Component {
 
   renderScene(route, navigator) {
     const Component = ROUTES[route.name];
-    return <Component route={route} navigator={navigator} />; 
+    return <Component route={route} navigator={navigator} />;
   }
 
   render() {
     return (
       <Navigator
         style={ styles.container }
-        initialRoute={{name: 'login'}}
+        initialRoute={{name: 'map'}}
         renderScene={this.renderScene}
         configureScene={ () => { return Navigator.SceneConfigs.FloatFromRight; } }
       />
