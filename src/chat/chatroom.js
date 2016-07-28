@@ -8,7 +8,8 @@ import {
   ScrollView,
   TouchableHighlight,
   StyleSheet,
-  Dimensions
+  Dimensions,
+  Navigator
 } from 'react-native';
 
 const windowSize = Dimensions.get('window');
@@ -35,7 +36,6 @@ export default class Chatroom extends Component {
 
   componentWillMount() {
     this.getMessagesOnMount = this.getMessagesOnMount.bind(this);
-    this.onBackPress = this.onBackPress.bind(this);
     this.getMessagesOnMount();
   }
 
@@ -62,9 +62,7 @@ export default class Chatroom extends Component {
 
   // TODO: Add functionality to back-button
   onBackPress() {
-    this.props.navigator.push({
-      name: 'map'
-    })
+    console.log('navigate back a page');
   }
 
   // TODO: Turn list into separate component
