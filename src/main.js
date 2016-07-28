@@ -16,34 +16,40 @@ const ioConfig = {
 
 import Login from './login/login';
 import Map from './map/map';
+import Chatroom from './chat/chatroom';
 
 const ROUTES = {
   login: Login,
   map: Map,
+  chatroom: Chatroom
 }
+
+const defaultRoute = 'chatroom'; // adjust for testing
 
 export default class Crumbs extends Component {
   constructor(props) {
     super(props);
     this.socket = io('http://localhost:3000', ioConfig);
+
+    this.socket.emit('test from client');
   }
 
   renderScene(route, navigator) {
     const Component = ROUTES[route.name];
-    return <Component route={route} navigator={navigator} />;
+    // this.socket is bound to the Crumbs scope when renderScene is set in the Navigator
+    return <Component route={route} navigator={navigator} socket={this.socket} />; 
   }
 
   render() {
     return (
       <Navigator
         style={ styles.container }
-        initialRoute={{name: 'map'}}
-        renderScene={this.renderScene}
+        initialRoute={{name: defaultRoute}}
+        renderScene={this.renderScene.bind(this)}
         configureScene={ () => { return Navigator.SceneConfigs.FloatFromRight; } }
       />
     );
   }
-
 }
 
 const styles = StyleSheet.create({

@@ -1,0 +1,14 @@
+{
+	"folders":
+	[
+		{
+			"path": "."
+		},
+		{
+			"path": "/Users/HannahHenderson/Documents/HackReactor/week7/crumbs-server"
+		}
+	],
+  "syntax_override": {
+    "\\.js$": ["Babel", "JavaScript (Babel)"]
+  }
+}
