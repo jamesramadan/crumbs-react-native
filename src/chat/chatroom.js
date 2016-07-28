@@ -8,8 +8,7 @@ import {
   ScrollView,
   TouchableHighlight,
   StyleSheet,
-  Dimensions,
-  Navigator
+  Dimensions
 } from 'react-native';
 
 const windowSize = Dimensions.get('window');
@@ -36,12 +35,16 @@ export default class Chatroom extends Component {
 
   componentWillMount() {
     this.getMessagesOnMount = this.getMessagesOnMount.bind(this);
+    this.onBackPress = this.onBackPress.bind(this);
     this.getMessagesOnMount();
   }
 
   onSendPress() {
-    this.emitAddMessageToChatRoom()
-    this.setState({ message: ''})
+    if (this.state.message) {
+      this.emitAddMessageToChatRoom();
+      this.setState({ message: ''});
+      this._msgInput.setNativeProps({text: ''});   
+    }
   }
 
   // TODO: Get actual username and location
@@ -62,7 +65,9 @@ export default class Chatroom extends Component {
 
   // TODO: Add functionality to back-button
   onBackPress() {
-    console.log('navigate back a page');
+    this.props.navigator.push({
+      name: 'map'
+    })
   }
 
   // TODO: Turn list into separate component
@@ -99,7 +104,6 @@ export default class Chatroom extends Component {
             ref={(c) => this._scrollView = c}
             onScroll={this.handleScroll}
             scrollEventThrottle={16}
-            
           >
           {list}
           </ScrollView>
@@ -109,6 +113,7 @@ export default class Chatroom extends Component {
             <TextInput
               style={styles.input}
               value={this.message}
+              ref={component=> this._msgInput = component}
               onChangeText={(text) => this.setState({message: text})}
               />
           </View>
