@@ -24,7 +24,7 @@ const ROUTES = {
   chatroom: Chatroom
 }
 
-const defaultRoute = 'login'; // adjust for testing
+const defaultRoute = 'map'; // adjust for testing
 
 export default class Crumbs extends Component {
   constructor(props) {
