@@ -5,9 +5,11 @@ import {
   Image,
   TextInput,
   ListView,
+  ScrollView,
   TouchableHighlight,
+  StyleSheet,
   Dimensions,
-  StyleSheet
+  Navigator
 } from 'react-native';
 
 const windowSize = Dimensions.get('window');
@@ -21,45 +23,66 @@ export default class Chatroom extends Component {
     this.state = {
       message: null,
       messageList: [],
-      location: '37.7837-122.4090',
+      location: '37.784-122.409',
       demoMode: true,
       userLoggedIn: false,
+      username: 'Hannah Test Person'
     }
+
+    this.emitAddMessageToChatRoom();
+    this.getMessagesOnMount();
 
   }
 
   componentWillMount() {
-    this.onSendPress = this.onSendPress.bind(this);
-    this.onGetChat = this.onGetChat.bind(this)
-  }
-
-  onGetChat() {
-    this.props.socket.on('updateMessagesState', updatedChatRoom => {
-      console.log('messages received:', updatedChatRoom);
-      this.setState({ messageList: updatedChatRoom });
-    })
+    this.getMessagesOnMount = this.getMessagesOnMount.bind(this);
+    this.getMessagesOnMount();
   }
 
   onSendPress() {
+    this.emitAddMessageToChatRoom()
+    this.setState({ message: ''})
+  }
+
+  // TODO: Get actual username and location
+  emitAddMessageToChatRoom() {
     this.props.socket.emit('addMessageToChatRoom', { 
         location: this.state.location,
         message: this.state.message,
-        username: null // TODO: Add Username
+        username: this.state.username 
       });
-
-    console.log('addMessageToChatRoom:', this.state.message);
-
-    this.setState({
-      message: '',
-    })
-
   }
 
+  getMessagesOnMount() {
+    this.props.socket.on('updateMessagesState', updatedChatRoom => {
+      const messages = updatedChatRoom ? updatedChatRoom.messages : null;
+      this.setState({ messageList: messages });
+    })
+  }
+
+  // TODO: Add functionality to back-button
   onBackPress() {
     console.log('navigate back a page');
   }
 
+  // TODO: Turn list into separate component
   render() {
+    var list = this.state.messageList.map((item, index) => {
+      return (
+        <View
+          style={styles.messageContainer}
+          key={index}
+          >
+          <Text style={this.nameLabel}>
+            {item.username}
+            <Text style={styles.messageLabel}> : {item.message}</Text>
+          </Text>
+        </View>
+      )
+    })
+    
+    list.reverse(); // display most recent messages first
+
     return (
       <View style={styles.container}>
         <View style={styles.topContainer}>
@@ -71,8 +94,15 @@ export default class Chatroom extends Component {
           <Text style={{color: 'black'}}>&lt; Back</Text>
           </TouchableHighlight>
         </View>
-        <View>
-          <Text style={{color: '#fff'}}>CHAT</Text>
+        <View style={styles.chatContainer}>
+          <ScrollView
+            ref={(c) => this._scrollView = c}
+            onScroll={this.handleScroll}
+            scrollEventThrottle={16}
+            
+          >
+          {list}
+          </ScrollView>
         </View>
         <View style={styles.inputContainer}>
           <View style={styles.textContainer}>
@@ -109,12 +139,12 @@ var styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     backgroundColor: '#c2edff',
-    paddingTop: 1,
+    paddingTop: 20,
   },
   chatContainer: {
     flex: 11,
     justifyContent: 'center',
-    alignItems: 'stretch'
+    alignItems: 'stretch',
   },
   inputContainer: {
     flex: 1,
@@ -132,7 +162,7 @@ var styles = StyleSheet.create({
     paddingRight: 10
   },
   sendLabel: {
-    color: '#ffffff',
+    color: 'black',
     fontSize: 15
   },
   input: {
@@ -142,7 +172,7 @@ var styles = StyleSheet.create({
     paddingLeft: 10,
     paddingTop: 5,
     height: 32,
-    borderColor: '#6E5BAA',
+    borderColor: 'black',
     borderWidth: 1,
     borderRadius: 2,
     alignSelf: 'center',
