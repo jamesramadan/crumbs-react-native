@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import Hyperlink from 'react-native-hyperlink';
 
+
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -17,9 +19,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#87CEEB',
   },
   loginContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
   },
   header: {
     fontSize: 60,
