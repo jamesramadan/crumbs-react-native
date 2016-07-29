@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 /* eslint-disable no-console */
-const log = msg => console.log(msg);
+const log = (...args) => console.log(...args);
 /* eslint-enable no-console */
 
 const styles = StyleSheet.create({
@@ -33,21 +33,40 @@ export default class Map extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentChatRoomId: '',
-      lastPosition: {},
-      chatRoomExists: true,
+      coords: '',
+      newRoom: true,
     };
   }
 
   componentDidMount() {
-    this.watchID = navigator.geolocation.watchPosition((position) => {
+    this.listenForGeoChange();
+  }
+
+  componentWillUnmount() {
+    navigator.geolocation.clearWatch(this.watchID);
+  }
+
+  listenForGeoChange() {
+    this.watchID = navigator.geolocation.watchPosition(position => {
       const coordStr = this.createChatRoomId(position.coords);
-      if (coordStr !== this.state.lastPosition) {
-        this.setState({
-          lastPosition: coordStr,
-        });
+      if (coordStr !== this.state.coords) {
+        this.setState({ coords: coordStr }, () => this.checkForChatRoom());
+      } else {
+        this.setState({ newRoom: false });
       }
-    }, { enableHighAccuracy: true });
+    });
+  }
+
+  checkForChatRoom() {
+    this.props.socket.emit('updateMessagesState', this.state.coords);
+    this.props.socket.on('updateMessagesState', result => {
+      log('result of updateMessagesState', result);
+      if (result === null) {
+        this.setState({ newRoom: true });
+      } else {
+        this.setState({ newRoom: false });
+      }
+    });
   }
 
   createChatRoomId(coordObj) {
@@ -57,11 +76,11 @@ export default class Map extends Component {
   }
 
   createNewChatRoom() {
-    log('creating new chat room...');
-    // do some stuff to create a room socket
-    // this.props.navigator.push({
-    //   name: 'chat'
-    // })
+    log('creating new chat room at', this.state.coords);
+    this.props.socket.emit('createChatRoom', this.state.coords);
+    this.props.navigator.push({
+      name: 'chatroom',
+    });
   }
 
   enterExistingChatRoom() {
@@ -79,18 +98,18 @@ export default class Map extends Component {
           followUserLocation
         />
         {
-          this.state.chatRoomExists ?
-            <TouchableHighlight
-              style={styles.button}
-              onPress={() => this.enterExistingChatRoom()}
-            >
-              <Text style={styles.buttonText}>Enter Chat Room</Text>
-            </TouchableHighlight> :
+          this.state.newRoom ?
             <TouchableHighlight
               style={styles.button}
               onPress={() => this.createNewChatRoom()}
             >
-              <Text style={styles.buttonText}>Create Chat Room</Text>
+              <Text style={styles.buttonText}>Create New Room</Text>
+            </TouchableHighlight> :
+            <TouchableHighlight
+              style={styles.button}
+              onPress={() => this.enterExistingChatRoom()}
+            >
+              <Text style={styles.buttonText}>Join Existing Room</Text>
             </TouchableHighlight>
         }
       </View>
@@ -100,4 +119,5 @@ export default class Map extends Component {
 
 Map.propTypes = {
   navigator: PropTypes.object.isRequired,
+  socket: PropTypes.object.isRequired,
 };

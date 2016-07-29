@@ -1,7 +1,3 @@
-
-
-
-
 import React, { Component } from 'react';
 import {
   StyleSheet,
@@ -25,10 +21,10 @@ const ROUTES = {
   login: Login,
   map: Map,
   chatroom: Chatroom,
-  signup: Signup
+  signup: Signup,
 };
 
-const defaultRoute = 'login'; // adjust for testing
+const defaultRoute = 'map'; // adjust for testing
 
 const styles = StyleSheet.create({
   container: {
