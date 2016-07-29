@@ -5,14 +5,14 @@ import {
   StyleSheet,
   TextInput,
   TouchableHighlight,
-  Image
+  Image,
 } from 'react-native';
 import Hyperlink from 'react-native-hyperlink';
 
 export default class Login extends Component {
   constructor(props) {
     super(props);
-    this.state = {username: '', password: ''};
+    this.state = { username: '', password: '' };
   }
 
   onButtonPress() {
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 60,
-    color: 'orange'
+    color: 'orange',
   },
   input: {
       width: 250,
@@ -119,3 +119,4 @@ const styles = StyleSheet.create({
       color: '#ffffff'
   }
 });
+
