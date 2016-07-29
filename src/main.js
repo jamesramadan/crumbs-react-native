@@ -1,3 +1,7 @@
+
+
+
+
 import React, { Component } from 'react';
 import {
   StyleSheet,
@@ -15,14 +19,16 @@ const ioConfig = {
 import Login from './login/login';
 import Map from './map/map';
 import Chatroom from './chat/chatroom';
+import Signup from './login/signup';
 
 const ROUTES = {
   login: Login,
   map: Map,
   chatroom: Chatroom,
+  signup: Signup
 };
 
-const defaultRoute = 'map'; // adjust for testing
+const defaultRoute = 'login'; // adjust for testing
 
 const styles = StyleSheet.create({
   container: {
