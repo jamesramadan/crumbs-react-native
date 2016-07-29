@@ -12,30 +12,30 @@ import {
 } from 'react-native';
 
 const windowSize = Dimensions.get('window');
-const PULLDOWN_DISTANCE = 40;
 
 export default class Chatroom extends Component {
   constructor(props) {
 
     super(props); // provides access to props.socket
 
+    // TODO: Incorporate actual, dynamic data
     this.state = {
       message: null,
       messageList: [],
       location: '37.784-122.409',
-      demoMode: true,
       userLoggedIn: false,
-      username: 'Hannah Test Person'
+      username: 'Hannah Test Person',
+      imgUrl: 'http://fany.savina.net/wp-content/uploads/2010/04/silhouette.jpg'
     }
 
-    this.emitAddMessageToChatRoom();
-    this.getMessagesOnMount();
+    this.props.socket.emit('updateMessagesState', this.state.location);
 
   }
 
   componentWillMount() {
     this.getMessagesOnMount = this.getMessagesOnMount.bind(this);
     this.onBackPress = this.onBackPress.bind(this);
+    this.onLogoutPress = this.onLogoutPress.bind(this);
     this.getMessagesOnMount();
   }
 
@@ -49,6 +49,7 @@ export default class Chatroom extends Component {
 
   // TODO: Get actual username and location
   emitAddMessageToChatRoom() {
+    console.log(this.state.message);
     this.props.socket.emit('addMessageToChatRoom', { 
         location: this.state.location,
         message: this.state.message,
@@ -63,25 +64,33 @@ export default class Chatroom extends Component {
     })
   }
 
-  // TODO: Add functionality to back-button
   onBackPress() {
     this.props.navigator.push({
       name: 'map'
     })
   }
 
+  onLogoutPress() {
+    this.props.navigator.push({
+      name: 'login'
+    })
+  }
+ 
   // TODO: Turn list into separate component
   render() {
     var list = this.state.messageList.map((item, index) => {
       return (
-        <View
-          style={styles.messageContainer}
-          key={index}
-          >
-          <Text style={this.nameLabel}>
-            {item.username}
-            <Text style={styles.messageLabel}> : {item.message}</Text>
-          </Text>
+        <View style={styles.listItem}
+        key={index}
+        >
+          <View style={styles.listIcon}>
+            <Image style={styles.channelIcon} defaultSource={require('./profileIcon.png')} source={{uri: item.imgUrl}} />
+          </View>
+          <View style={styles.listInfo}>
+            <Text style={styles.titleLabel}>{item.message}</Text>
+            <Text style={styles.memberLabel}>{item.username}</Text>
+  
+          </View>
         </View>
       )
     })
@@ -91,13 +100,22 @@ export default class Chatroom extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.topContainer}>
-          <TouchableHighlight
-            underlayColor={'#dcf4ff'}
-            onPress={this.onBackPress}
-            style={{marginLeft: 15}}
-          >
-          <Text style={{color: 'black'}}>&lt; Back</Text>
-          </TouchableHighlight>
+          <View style={styles.topContainerLeft}>
+            <TouchableHighlight style={styles.touchable}
+              underlayColor={'#dcf4ff'}
+              onPress={this.onBackPress}
+            >
+            <Text style={{color: 'black'}}>&lt; Back</Text>
+            </TouchableHighlight>
+          </View>
+          <View style={styles.topContainerRight}>
+            <TouchableHighlight style={styles.touchable}
+              underlayColor={'#dcf4ff'}
+              onPress={this.onLogoutPress}
+            >
+            <Text>Logout &gt;</Text>
+            </TouchableHighlight>
+          </View>
         </View>
         <View style={styles.chatContainer}>
           <ScrollView
@@ -141,10 +159,20 @@ var styles = StyleSheet.create({
   },
   topContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#c2edff',
-    paddingTop: 20,
+    paddingTop: 20
+  },
+  topContainerLeft: {
+    justifyContent: 'flex-start',
+    width: windowSize.width / 2
+  },
+  topContainerRight: {
+    justifyContent: 'flex-end',
+    width: windowSize.width / 2,
+    alignItems: 'flex-end',
+    paddingRight: 10
   },
   chatContainer: {
     flex: 11,
@@ -183,5 +211,37 @@ var styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: '#ffffff'
   },
+  listItem: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f7f8fc',
+    borderBottomWidth: 0.5,
+    borderColor: '#D0DBE4',
+    padding: 5
+  },
+  listIcon: {
+    justifyContent: 'flex-start',
+    paddingLeft: 10,
+    paddingRight: 15
+  },
+  listInfo: {
+    flex: 1,
+    justifyContent: 'flex-start'
+  },
+  titleLabel: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#60768b'
+  },
+  memberLabel: {
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#abb8c4'
+  },
+  touchable: {
+    marginLeft: 15
+  }
 
 });
