@@ -9,32 +9,25 @@ import {
 } from 'react-native';
 import Hyperlink from 'react-native-hyperlink';
 
-export default class Login extends Component {
+export default class Signup extends Component {
   constructor(props) {
     super(props);
     this.state = {username: '', password: ''};
   }
 
-  onButtonPress() {
+  onPress() {
     console.log(this.state.username);
     this.props.navigator.push({
       name: 'map'
     })
   }
   
-  onLinkPress() {
-    console.log(this.state.username);
-    this.props.navigator.push({
-      name: 'signup'
-    })
-  }
-
   render() {
     return (
       <View style={styles.container}>
         <View style={styles.loginContainer}>
-                  <Image source={require("./cookie.jpg")} />
                   <Text style={styles.header}> Crumbs </Text>
+                  <Text style={styles.subheader}> Create a Profile </Text>
                   <TextInput
                     style={styles.input}
                     value={this.state.username}
@@ -54,17 +47,10 @@ export default class Login extends Component {
                  <TouchableHighlight
                     style={styles.button}
                     underlayColor={'#328FE6'}
-                    onPress= {() => this.onButtonPress()}
+                    onPress={() => this.onPress()}
                     >
-                    <Text style={styles.label}>LOGIN</Text>
+                    <Text style={styles.label}>SIGN UP</Text>
                 </TouchableHighlight>
-                <Hyperlink>
-                            <View>
-                                <Text style={{fontSize:15}}>
-                                Not a member? <Text onPress={() => this.onLinkPress()} style={{color: 'blue', fontSize:15}}>Create a Profile</Text>
-                                </Text>
-                            </View>
-                </Hyperlink>
         </View>
       </View>
     );
@@ -85,8 +71,14 @@ const styles = StyleSheet.create({
       alignItems: 'center',
   },
   header: {
+    alignItems: 'center',
     fontSize: 60,
     color: 'orange'
+  },
+  subheader: {
+    alignItems: 'center',
+    fontSize: 20,
+    color: 'black'
   },
   input: {
       width: 250,
