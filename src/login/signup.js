@@ -15,6 +15,20 @@ export default class Signup extends Component {
     this.state = {username: '', password: ''};
   }
 
+  validateUser() {
+    this.props.socket.emit('validateUserSignup', { 
+        username: this.state.username,
+        password: this.state.password
+    });
+  }
+
+  componentWillMount() {
+    this.props.socket.on('Authentication', username => {
+      console.log('heyo');
+      console.log(username);
+    })
+  }
+
   onPress() {
     console.log(this.state.username);
     this.props.navigator.push({
@@ -26,31 +40,31 @@ export default class Signup extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.loginContainer}>
-                  <Text style={styles.header}> Crumbs </Text>
-                  <Text style={styles.subheader}> Create a Profile </Text>
-                  <TextInput
-                    style={styles.input}
-                    value={this.state.username}
-                    onChangeText={(text) => this.setState({username: text})}
-                    placeholder={'Enter Username'}
-                    maxLength={12}
-                    multiline={false}
-                    />
-                  <TextInput
-                      style={styles.input}
-                      value={this.state.password}
-                      onChangeText={(text) => this.setState({password: text})}
-                      placeholder={'Enter Password'}
-                      maxLength={12}
-                      multiline={false}
-                  />
-                 <TouchableHighlight
-                    style={styles.button}
-                    underlayColor={'#328FE6'}
-                    onPress={() => this.onPress()}
-                    >
-                    <Text style={styles.label}>SIGN UP</Text>
-                </TouchableHighlight>
+            <Text style={styles.header}> Crumbs </Text>
+            <Text style={styles.subheader}> Create a Profile </Text>
+            <TextInput
+              style={styles.input}
+              value={this.state.username}
+              onChangeText={(text) => this.setState({username: text})}
+              placeholder={'Enter Username'}
+              maxLength={12}
+              multiline={false}
+              />
+            <TextInput
+                style={styles.input}
+                value={this.state.password}
+                onChangeText={(text) => this.setState({password: text})}
+                placeholder={'Enter Password'}
+                maxLength={12}
+                multiline={false}
+            />
+           <TouchableHighlight
+              style={styles.button}
+              underlayColor={'#328FE6'}
+              onPress={() => this.validateUser()}
+              >
+              <Text style={styles.label}>SIGN UP</Text>
+          </TouchableHighlight>
         </View>
       </View>
     );

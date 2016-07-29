@@ -15,6 +15,20 @@ export default class Login extends Component {
     this.state = { username: '', password: '' };
   }
 
+  validateUser() {
+    this.props.socket.emit('validateUserLogin', { 
+        username: this.state.username,
+        password: this.state.password
+    });
+  }
+
+  componentWillMount() {
+    this.props.socket.on('Authentication', username => {
+      console.log('heyo2');
+      console.log(username);
+    });
+  }
+
   onButtonPress() {
     console.log(this.state.username);
     this.props.navigator.push({
@@ -33,38 +47,38 @@ export default class Login extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.loginContainer}>
-                  <Image source={require("./cookie.jpg")} />
-                  <Text style={styles.header}> Crumbs </Text>
-                  <TextInput
-                    style={styles.input}
-                    value={this.state.username}
-                    onChangeText={(text) => this.setState({username: text})}
-                    placeholder={'Enter Username'}
-                    maxLength={12}
-                    multiline={false}
-                    />
-                  <TextInput
-                      style={styles.input}
-                      value={this.state.password}
-                      onChangeText={(text) => this.setState({password: text})}
-                      placeholder={'Enter Password'}
-                      maxLength={12}
-                      multiline={false}
-                  />
-                 <TouchableHighlight
-                    style={styles.button}
-                    underlayColor={'#328FE6'}
-                    onPress= {() => this.onButtonPress()}
-                    >
-                    <Text style={styles.label}>LOGIN</Text>
-                </TouchableHighlight>
-                <Hyperlink>
-                            <View>
-                                <Text style={{fontSize:15}}>
-                                Not a member? <Text onPress={() => this.onLinkPress()} style={{color: 'blue', fontSize:15}}>Create a Profile</Text>
-                                </Text>
-                            </View>
-                </Hyperlink>
+          <Image source={require("./cookie.jpg")} />
+          <Text style={styles.header}> Crumbs </Text>
+          <TextInput
+            style={styles.input}
+            value={this.state.username}
+            onChangeText={(text) => this.setState({username: text})}
+            placeholder={'Enter Username'}
+            maxLength={12}
+            multiline={false}
+            />
+          <TextInput
+              style={styles.input}
+              value={this.state.password}
+              onChangeText={(text) => this.setState({password: text})}
+              placeholder={'Enter Password'}
+              maxLength={12}
+              multiline={false}
+          />
+         <TouchableHighlight
+            style={styles.button}
+            underlayColor={'#328FE6'}
+            onPress= {() => this.validateUser()}
+            >
+            <Text style={styles.label}>LOGIN</Text>
+        </TouchableHighlight>
+        <Hyperlink>
+            <View>
+                <Text style={{fontSize:15}}>
+                Not a member? <Text onPress={() => this.onLinkPress()} style={{color: 'blue', fontSize:15}}>Create a Profile</Text>
+                </Text>
+            </View>
+        </Hyperlink>
         </View>
       </View>
     );
@@ -77,12 +91,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#87CEEB',
+    backgroundColor: '#87CEEB'
   },
   loginContainer: {
-      flex: 1,
+  flex: 1,
       justifyContent: 'center',
-      alignItems: 'center',
+      alignItems: 'center'
   },
   header: {
     fontSize: 60,
@@ -110,13 +124,13 @@ const styles = StyleSheet.create({
       backgroundColor: '#32c5e6'
   },
   label: {
-      width: 230,
-      flex: 1,
-      alignSelf: 'center',
-      textAlign: 'center',
-      fontSize: 20,
-      fontWeight: '600',
-      color: '#ffffff'
+    width: 230,
+    flex: 1,
+    alignSelf: 'center',
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#ffffff'
   }
 });
 
