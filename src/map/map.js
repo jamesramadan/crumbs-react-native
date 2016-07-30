@@ -5,10 +5,11 @@ import {
   MapView,
   TouchableHighlight,
   Text,
+  AlertIOS,
 } from 'react-native';
 
 /* eslint-disable no-console */
-const log = (...args) => console.log(...args);
+// const log = (...args) => console.log(...args);
 /* eslint-enable no-console */
 
 const styles = StyleSheet.create({
@@ -33,57 +34,69 @@ export default class Map extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      coords: '',
-      newRoom: true,
+      location: '',
+      joinRoom: false,
+      showAlert: false,
     };
+
+    this.onEachGeoChange = this.onEachGeoChange.bind(this);
+    this.handleRoomCheck = this.handleRoomCheck.bind(this);
+    this.handleRoomCreation = this.handleRoomCreation.bind(this);
+
+    this.props.socket.on('room:checked', this.handleRoomCheck);
+    this.props.socket.on('room:created', this.handleRoomCreation);
   }
 
   componentDidMount() {
-    this.listenForGeoChange();
+    this.watchID = navigator.geolocation.watchPosition(this.onEachGeoChange);
   }
 
   componentWillUnmount() {
     navigator.geolocation.clearWatch(this.watchID);
   }
 
-  listenForGeoChange() {
-    this.watchID = navigator.geolocation.watchPosition(position => {
-      const coordStr = this.createChatRoomId(position.coords);
-      if (coordStr !== this.state.coords) {
-        this.setState({ coords: coordStr }, () => this.checkForChatRoom());
-      } else {
-        this.setState({ newRoom: false });
-      }
-    });
+  onEachGeoChange(position) {
+    const curLocation = this.createLocationStr(position.coords);
+    if (curLocation !== this.state.location) {
+      this.setState({ location: curLocation }, () => this.checkForRoom());
+    }
   }
 
-  checkForChatRoom() {
-    this.props.socket.emit('updateMessagesState', this.state.coords);
-    this.props.socket.on('updateMessagesState', result => {
-      log('result of updateMessagesState', result);
-      if (result === null) {
-        this.setState({ newRoom: true });
-      } else {
-        this.setState({ newRoom: false });
-      }
-    });
-  }
-
-  createChatRoomId(coordObj) {
+  createLocationStr(coordObj) {
     const latStr = (Math.trunc(coordObj.latitude * 1000) / 1000).toFixed(3).toString();
     const lngStr = (Math.trunc(coordObj.longitude * 1000) / 1000).toFixed(3).toString();
     return latStr + lngStr;
   }
 
-  createNewChatRoom() {
-    log('creating new chat room at', this.state.coords);
-    this.props.socket.emit('createChatRoom', this.state.coords);
-    this.props.navigator.push({
-      name: 'chatroom',
-    });
+  checkForRoom() {
+    this.props.socket.emit('check:room', this.state.location);
   }
 
-  enterExistingChatRoom() {
+  createRoom() {
+    this.props.socket.emit('create:room', this.state.location);
+  }
+
+  handleRoomCheck(response) {
+    if (response.location === this.state.location) {
+      if (response.exists.room === true) {
+        this.setState({ joinRoom: true }); // this switches the button to 'Join Room'
+      } else {
+        this.setState({ joinRoom: false }); // ensures that the
+      }
+    } else {
+      this.checkForRoom();
+    }
+  }
+
+  handleRoomCreation(response) {
+    if (response.room) {
+      this.checkForRoom();
+    } else {
+      this.setState({ showAlert: true });
+    }
+  }
+
+  joinRoom() {
     this.props.navigator.push({
       name: 'chatroom',
     });
@@ -97,19 +110,24 @@ export default class Map extends Component {
           showsUserLocation
           followUserLocation
         />
+        {this.state.showAlert &&
+          AlertIOS.alert(
+            'OOPS', 'Could not create a room :(',
+            () => this.setState({ showAlert: false }))
+        }
         {
-          this.state.newRoom ?
+          this.state.joinRoom ?
             <TouchableHighlight
               style={styles.button}
-              onPress={() => this.createNewChatRoom()}
+              onPress={() => this.joinRoom()}
             >
-              <Text style={styles.buttonText}>Create New Room</Text>
+              <Text style={styles.buttonText}>Join Room!</Text>
             </TouchableHighlight> :
             <TouchableHighlight
               style={styles.button}
-              onPress={() => this.enterExistingChatRoom()}
+              onPress={() => this.createRoom()}
             >
-              <Text style={styles.buttonText}>Join Existing Room</Text>
+              <Text style={styles.buttonText}>Create New Room!</Text>
             </TouchableHighlight>
         }
       </View>
