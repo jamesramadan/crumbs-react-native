@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableHighlight,
   Image,
+  AsyncStorage,
 } from 'react-native';
 import Hyperlink from 'react-native-hyperlink';
 
@@ -57,27 +58,29 @@ const styles = StyleSheet.create({
   },
 });
 
-
 export default class Login extends Component {
   constructor(props) {
     super(props);
     this.state = { username: '', password: '' };
-  }
-
-  componentWillMount() {
     this.props.socket.on('Authentication', username => { 
+      try {
+        AsyncStorage.setItem(this.props.storage_key, username).then(message => {
+          AsyncStorage.getItem(this.props.storage_key).then(result => {
+            console.log('successfully set username to: ' +  result);
+            this.props.navigator.push({
+              name: 'map',
+            });
+          })  
+        });
+      } catch (error) {
+        console.log('there was an error' + error);
+      }
     });
   }
 
   onLinkPress() {
     this.props.navigator.push({
       name: 'signup',
-    });
-  }
-
-  onButtonPress() {
-    this.props.navigator.push({
-      name: 'map',
     });
   }
 

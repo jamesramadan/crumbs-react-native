@@ -5,7 +5,9 @@ import {
   StyleSheet,
   TextInput,
   TouchableHighlight,
+  AsyncStorage,
 } from 'react-native';
+import Hyperlink from 'react-native-hyperlink';
 
 const styles = StyleSheet.create({
   container: {
@@ -65,16 +67,25 @@ export default class Signup extends Component {
   constructor(props) {
     super(props);
     this.state = { username: '', password: '' };
-  }
-
-  componentWillMount() {
-    this.props.socket.on('Authentication', username => {
+    this.props.socket.on('Authentication', username => { 
+      try {
+        AsyncStorage.setItem(this.props.storage_key, username).then(message => {
+          AsyncStorage.getItem(this.props.storage_key).then(result => {
+            console.log('successfully set username to: ' +  result);
+            this.props.navigator.push({
+              name: 'map',
+            });
+          })  
+        });
+      } catch (error) {
+        console.log('there was an error' + error);
+      }
     });
   }
 
-  onPress() {
+  onLinkPress() {
     this.props.navigator.push({
-      name: 'map',
+      name: 'login',
     });
   }
 
@@ -114,6 +125,13 @@ export default class Signup extends Component {
           >
             <Text style={styles.label}>SIGN UP</Text>
           </TouchableHighlight>
+          <Hyperlink>
+            <View>
+              <Text style={{ fontSize: 15 }}>
+                Already a member? <Text onPress={() => this.onLinkPress()} style={{color: 'blue', fontSize:15}}>Login</Text>
+              </Text>
+            </View>
+          </Hyperlink>
         </View>
       </View>
     );
