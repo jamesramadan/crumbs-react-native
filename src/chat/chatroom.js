@@ -37,6 +37,7 @@ export default class Chatroom extends Component {
     });
 
     this.props.socket.on('message:added', result => {
+      log('message added');
       const messageList = this.state.messageList;
       messageList.push(result.message);
       this.setState({ messageList });
@@ -47,7 +48,6 @@ export default class Chatroom extends Component {
     this.onBackPress = this.onBackPress.bind(this);
     this.onLogoutPress = this.onLogoutPress.bind(this);
 
-    // TODO: Pull username from async store
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const loc = this.createChatRoomId(position.coords);
@@ -68,8 +68,6 @@ export default class Chatroom extends Component {
     navigator.geolocation.clearWatch(this.watchID);
   }
 
-  // TODO: if there's a change in geolocation, trigger to see if location (aka chatroom) has changed
-  //       if so then navigate away
   onSendPress() {
     if (this.state.message) {
       this.emitAddMessageToChatRoom();
@@ -79,16 +77,23 @@ export default class Chatroom extends Component {
   }
 
   onBackPress() {
-    navigator.geolocation.clearWatch(this.watchID);
-    this.props.navigator.push({
+    this.myUnmount();
+    this.props.navigator.jumpTo({
       name: 'map',
     });
   }
 
   onLogoutPress() {
+    this.myUnmount();
     this.props.navigator.push({
       name: 'login',
     });
+  }
+
+  myUnmount() {
+    this.props.socket.off('room:joined');
+    this.props.socket.off('message:added');
+    navigator.geolocation.clearWatch(this.watchID);
   }
 
   listenForGeoChange() {
@@ -165,7 +170,7 @@ export default class Chatroom extends Component {
                     'Exit chatroom and return to login page?',
                 [
                   { text: 'CANCEL', onPress: () => log('cancel pressed') },
-                  { text: 'OK', onPress: () => this.onLogoutPress() },
+                  { text: 'OK', onPress: this.onLogoutPress },
                 ]
                   )}
             >
@@ -191,7 +196,7 @@ export default class Chatroom extends Component {
           </View>
           <View style={styles.sendContainer}>
             <TouchableHighlight
-              underlayColor={'red'}
+              underlayColor={'#dcf4ff'}
               onPress={() => this.onSendPress()}
             >
               <Text style={styles.sendLabel}>SEND</Text>
