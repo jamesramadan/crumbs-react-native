@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
   StyleSheet,
-  Navigator,
+  Navigator
 } from 'react-native';
 
 window.navigator.userAgent = 'react-native';
@@ -24,7 +24,7 @@ const ROUTES = {
   signup: Signup,
 };
 
-const defaultRoute = 'map'; // adjust for testing
+const defaultRoute = 'login'; // adjust for testing
 
 const styles = StyleSheet.create({
   container: {
