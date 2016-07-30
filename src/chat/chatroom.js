@@ -30,8 +30,7 @@ export default class Chatroom extends Component {
       username: 'default_user',
     };
 
-    // TODO: change socket message to room:joined
-    this.props.socket.on('updateMessagesState', updatedChatRoom => {
+    this.props.socket.on('room:joined', updatedChatRoom => {
       const messages = updatedChatRoom ? updatedChatRoom.messages : [];
       this.setState({ messageList: messages });
     });
@@ -42,16 +41,14 @@ export default class Chatroom extends Component {
     this.onLogoutPress = this.onLogoutPress.bind(this);
 
     // TODO: Pull username from async store
-    // TODO: Update socket
-        // this.props.socket.emit('join:room', {
-        //   location: this.state.location,
-        //   username: this.state.username,
-        // });
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const loc = this.createChatRoomId(position);
+        const loc = this.createChatRoomId(position.coords);
         this.setState({ location: loc });
-        this.props.socket.emit('updateMessagesState', this.state.location);
+        this.props.socket.emit('join:room', {
+          location: this.state.location,
+          username: this.state.username,
+        });
         this.listenForGeoChange();
       });
   }
@@ -71,6 +68,7 @@ export default class Chatroom extends Component {
   }
 
   onBackPress() {
+    navigator.geolocation.clearWatch(this.watchID);
     this.props.navigator.push({
       name: 'map',
     });
@@ -87,6 +85,8 @@ export default class Chatroom extends Component {
       const coordStr = this.createChatRoomId(position.coords);
       if (coordStr !== this.state.location) {
         log('location changed, return to map');
+        log(' state:', this.state.location);
+        log('   new:', coordStr);
         this.onBackPress();
       }
     });
@@ -98,11 +98,10 @@ export default class Chatroom extends Component {
     return latStr + lngStr;
   }
 
-  // TODO: Get actual username and location
+  // TODO: Get actual username
   emitAddMessageToChatRoom() {
     log(this.state.message);
-    // TODO: Change socket message emit('add:mesage')
-    this.props.socket.emit('addMessageToChatRoom', {
+    this.props.socket.emit('add:message', {
       location: this.state.location,
       message: this.state.message,
       username: this.state.username,

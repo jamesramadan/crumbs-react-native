@@ -81,6 +81,10 @@ module.exports = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 15,
   },
+  channelIcon: {
+    width: 40,
+    height: 40,
+  },
   listInfo: {
     flex: 1,
     justifyContent: 'flex-start',
