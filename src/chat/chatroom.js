@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableHighlight,
   Alert,
+  AsyncStorage,
 } from 'react-native';
 import styles from './chatroom.styles';
 import imgUrlDefault from './profileIcon.png';
@@ -22,17 +23,23 @@ const log = (...args) => console.log(...args);
 export default class Chatroom extends Component {
   constructor(props) {
     super(props); // provides access to props.socket
-
+    // TODO: Refactor location and messagelist to be part of a Room
     this.state = {
       message: '',
       messageList: [],
-      location: '37.784-122.409',
+      location: null,
       username: 'default_user',
     };
 
-    this.props.socket.on('room:joined', updatedChatRoom => {
-      const messages = updatedChatRoom ? updatedChatRoom.messages : [];
+    this.props.socket.on('room:joined', result => {
+      const messages = result.room ? result.room.messages : [];
       this.setState({ messageList: messages });
+    });
+
+    this.props.socket.on('message:added', result => {
+      const messageList = this.state.messageList;
+      messageList.push(result.message);
+      this.setState({ messageList });
     });
   }
 
@@ -45,11 +52,15 @@ export default class Chatroom extends Component {
       (position) => {
         const loc = this.createChatRoomId(position.coords);
         this.setState({ location: loc });
-        this.props.socket.emit('join:room', {
-          location: this.state.location,
-          username: this.state.username,
-        });
-        this.listenForGeoChange();
+        AsyncStorage.getItem(this.props.storage_key)
+          .then(username => {
+            this.state.username = username;
+            this.props.socket.emit('join:room', {
+              location: this.state.location,
+              username: this.state.username,
+            });
+            this.listenForGeoChange();
+          });
       });
   }
 
@@ -98,7 +109,6 @@ export default class Chatroom extends Component {
     return latStr + lngStr;
   }
 
-  // TODO: Get actual username
   emitAddMessageToChatRoom() {
     log(this.state.message);
     this.props.socket.emit('add:message', {
@@ -196,4 +206,5 @@ export default class Chatroom extends Component {
 Chatroom.propTypes = {
   navigator: PropTypes.object.isRequired,
   socket: PropTypes.object.isRequired,
+  storage_key: PropTypes.string,
 };
