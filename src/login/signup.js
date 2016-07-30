@@ -37,7 +37,7 @@ export default class Signup extends Component {
   }
 
   validateUser() {
-    this.props.socket.emit('validateUserSignup', { 
+    this.props.socket.emit('user:signUp', { 
       username: this.state.username,
       password: this.state.password,
     });

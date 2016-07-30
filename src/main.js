@@ -46,7 +46,7 @@ export default class Crumbs extends Component {
 
   renderScene(route, navigator) {
     const Cponent = ROUTES[route.name];
-    return <Cponent route={route} navigator={navigator} socket={this.socket} storage_key = {this.STORAGE_KEY} />;
+    return <Cponent route={route} navigator={navigator} socket={this.socket} storage_key={this.STORAGE_KEY} />;
   }
 
   render() {
