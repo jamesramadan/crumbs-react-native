@@ -5,6 +5,8 @@ import {
   StyleSheet,
   TextInput,
   TouchableHighlight,
+  Alert,
+  Image,
   AsyncStorage,
 } from 'react-native';
 import Hyperlink from 'react-native-hyperlink';
@@ -15,22 +17,28 @@ export default class Signup extends Component {
     super(props);
     this.state = { username: '', password: '' };
     this.props.socket.on('Authentication', username => { 
-      try {
-        AsyncStorage.setItem(this.props.storage_key, username).then(message => {
-          AsyncStorage.getItem(this.props.storage_key).then(result => {
-            console.log('successfully set username to: ' +  result);
-            this.props.navigator.push({
-              name: 'map',
-            });
-          })  
-        });
-      } catch (error) {
-        console.log('there was an error' + error);
+      if (username) {
+        try {
+          AsyncStorage.setItem(this.props.storage_key, username).then(message => {
+            AsyncStorage.getItem(this.props.storage_key).then(result => {
+              console.log('successfully set username to: ' +  result);
+              this.props.navigator.push({
+                name: 'map',
+              });
+            })  
+          });
+        } catch (error) {
+          console.log('there was an error' + error);
+        }
+      } else {
+        this.setState({ password: '' });
+        Alert.alert('Incorrect Username or Password', 'Please try again. If you are already a member, please login.');
       }
     });
   }
 
   onLinkPress() {
+    this.props.socket.off('Authentication');
     this.props.navigator.push({
       name: 'login',
     });
@@ -47,6 +55,7 @@ export default class Signup extends Component {
     return (
       <View style={styles.container}>
         <View style={styles.loginContainer}>
+          <Image source={require("./cookie.jpg")} />
           <Text style={styles.header}> Crumbs </Text>
           <Text style={styles.subheader}> Create a Profile </Text>
           <TextInput
@@ -59,6 +68,7 @@ export default class Signup extends Component {
           />
           <TextInput
             style={styles.input}
+            secureTextEntry={true}
             value={this.state.password}
             onChangeText={(text) => this.setState({ password: text })}
             placeholder={'Enter Password'}
